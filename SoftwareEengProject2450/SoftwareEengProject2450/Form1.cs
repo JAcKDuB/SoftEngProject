@@ -30,6 +30,10 @@ namespace Library
             txtMediaType.SelectedIndex = 0;
             db.readCatalog(ref mediaSD);
             db.readPatron(ref patronSD);
+            txtPatronItemsCheckedOut.SelectionMode = SelectionMode.MultiExtended;
+            lblPatronDispName.Text = string.Empty;
+            Media.Setup(mediaSD.Keys.Last());
+            UpdateScreens();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -47,7 +51,6 @@ namespace Library
         /// </summary>
         private void btnDisplayAllPatrons_Click(object sender, EventArgs e)
         {
-            txtDisplayPatron.Items.Clear();
             displayPatrons();
         }
         /// <summary>
@@ -55,40 +58,37 @@ namespace Library
         /// </summary>
         private void displayPatrons()
         {
+            txtDisplayPatron.Items.Clear();
 
             foreach (KeyValuePair<uint, Patron> p in this.patronSD)
             {
                 txtDisplayPatron.Items.Add(p.Value);
+                txtDisplayPatron.DisplayMember = "_name";
             }
         }
-        /// <summary>
-        /// Purpose: to display all currently checked books per patron
-        /// </summary>
-        private void btnViewChkedPerPatron_Click(object sender, EventArgs e)
-        {
-            if (txtDisplayPatron.SelectedIndex == -1)
-            {
-                MessageBox.Show("Please select a patron for which to view checked out media.");
-            }
-            else
-            {
-                Patron P = (Patron)txtDisplayPatron.SelectedItem; //=txtDisplayPatron.SelectedText
-                displayChecked(P);
-            }
-            
 
-        }
         /// <summary>
         /// Purpose: helper for btnDisplayCheckedPerPatron
         /// </summary>
         /// <param name="P">Patron</param>
         private void displayChecked(Patron P)
         {
-            foreach (KeyValuePair<uint, Media> m in P._currentChecked)
+            String str = P._name + " has ";
+            
+            if (P._currentChecked.Count > 0)
             {
-                MessageBox.Show(m.Value.ToString());
-
+                str += "checked out:\n\n";
+                foreach (KeyValuePair<uint, Media> m in P._currentChecked)
+                {
+                    str += "\t" + m.Value.Title + "\n";
+                }
             }
+            else
+            {
+                str += "nothing checked out.";
+            }
+
+            MessageBox.Show(str);
         }
         /// <summary>
         /// Purpose: to display all media items
@@ -99,10 +99,16 @@ namespace Library
         }
         private void displayMedia()
         {
+            lstvwMediaList.Items.Clear();
+
             foreach (KeyValuePair<uint, Media> m in mediaSD)
             {
-                txtDisplayMedia.Items.Add(m.Value);
+                ListViewItem item = new ListViewItem(m.Value.Title);
+                item.SubItems.Add(m.Value.Borrower._name);
+                item.SubItems.Add(m.Value.ID.ToString());
+                lstvwMediaList.Items.Add(item);
             }
+
         }
 
         private void btnAddPatron_Click(object sender, EventArgs e)
@@ -116,6 +122,8 @@ namespace Library
                 string combinedAddress = string.Concat(txtPatronAddress.Text, " ,", txtPatronCity.Text, ", ", txtPatronState.Text, ", ", txtPatronZip.Text);
                 patronSD.Add(uint.Parse(txtPatronCardNum.Text), new Patron(txtPatronName.Text, uint.Parse(txtPatronCardNum.Text), combinedAddress, txtPatronPhone.Text, txtPatronDateofBirth.Value));
                 MessageBox.Show("Patron added successfully!");
+                UpdateScreens();
+                ClearAddPatronFields();
             }
         }
         private void btnAddMedia_Click(object sender, EventArgs e)
@@ -148,6 +156,8 @@ namespace Library
                     mediaSD.Add(m.ID, m);
                 }
                 MessageBox.Show("Media item '" +txtMediaTitle.Text+"' added successfully!");
+                UpdateScreens();
+                ClearAddMediaFields();
             }
            
         }
@@ -198,7 +208,8 @@ namespace Library
                 {
                     MessageBox.Show("Removed "+p.ToString());
                     patronSD.Remove(cardNumber);
-                  
+                    UpdateScreens();
+                    ClearRemovePatronFields();
                 }
             }
         }
@@ -224,21 +235,38 @@ namespace Library
                 }
                 else
                 {
+                    if (M.Borrower != Patron.None)
+                    {
+                        if (!M.CheckIn(false))
+                        {
+                            MessageBox.Show("Failed to remove " + M.Title + " from patron " + M.Borrower._name);
+                        }
+                    }
+
                     MessageBox.Show(M.Title + " removed.");
                     mediaSD.Remove(i);
+                    UpdateScreens();
+                    ClearRemoveMediaFields();
                 }
             }
         }
 
         private void btnClearGUI_Click(object sender, EventArgs e)
         {
-            txtDisplayCheckInOut.Items.Clear();
-            txtDisplayMedia.Items.Clear();
-            txtDisplayPatron.Items.Clear();
+            ClearMainGUI();
+        }
+
+        /// <summary>
+        /// Clears everything on the main page
+        /// </summary>
+        private void ClearMainGUI()
+        {
             txtSearchMedia.Clear();
             txtSearchPatron.Clear();
             dateTimePicker.Value = DateTime.Today;
-            btnDeselect.Enabled = false;
+            lblPatronDispName.Text = string.Empty;
+            txtDisplayPatron.SelectedIndex = -1;
+            UpdateScreens();
         }
 
         private void btnDisplayOverdue_Click(object sender, EventArgs e)
@@ -252,63 +280,102 @@ namespace Library
             }  
         }
 
-        private void btnSelectPatron_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Updates the patron name label
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtDisplayPatron_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (txtDisplayPatron.SelectedIndex != -1)
             {
-                txtDisplayCheckInOut.Items.Add(txtDisplayPatron.SelectedItem);
-                btnDeselect.Enabled = true;
+                Patron patron = txtDisplayPatron.SelectedItem as Patron;
+                lblPatronDispName.Text = "Checked out to: " + patron._name;
+                UpdatePatronItemsCheckedOut(patron);
             }
-            else
-            {
-                MessageBox.Show(noPatron);
-            }     
         }
 
-        private void btnSelectMedia_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Fills the list box with the items the patron currently has checked out
+        /// </summary>
+        /// <param name="patron"></param>
+        private void UpdatePatronItemsCheckedOut(Patron patron)
         {
-            if (txtDisplayMedia.SelectedIndex != -1)
+            txtPatronItemsCheckedOut.Items.Clear();
+
+            foreach (KeyValuePair<uint, Media> m in patron._currentChecked)
             {
-                txtDisplayCheckInOut.Items.Add(txtDisplayMedia.SelectedItem);
-                btnDeselect.Enabled = true;
-              
+                Media media = m.Value;
+                txtPatronItemsCheckedOut.Items.Add(media);
+                txtPatronItemsCheckedOut.DisplayMember = "Title";
             }
-            else
+
+            if (txtPatronItemsCheckedOut.Items.Count > 0)
             {
-                MessageBox.Show(noMedia);
+                txtPatronItemsCheckedOut.SelectedIndex = 0;
             }
-            
-        }
 
-        private void btnDeselect_Click(object sender, EventArgs e)
-        {
-            txtDisplayCheckInOut.Items.Clear();
-        }
-
-
-        private void btnCheckIn_Click(object sender, EventArgs e)
-        {
-            CheckInMedia();            
-        }
+            CheckCheckInButton();
+        }       
 
         private void btnCheckOut_Click(object sender, EventArgs e)
         {
-           
+            CheckOutMedia();            
+        }
+
+        private void btnCheckIn_Click(object sender, EventArgs e)
+        {
+            CheckInMedia();
+        }
+
+        /// <summary>
+        /// Checks out media
+        /// </summary>
+        private void CheckOutMedia()
+        {
             if (txtDisplayPatron.SelectedIndex == -1)
             {
                 MessageBox.Show(noPatron);
             }
-            if (txtDisplayMedia.SelectedIndex == -1)
+
+            if (lstvwMediaList.SelectedItems.Count <= 0)
             {
                 MessageBox.Show(noMedia);
             }
             else
             {
                 Patron p = (Patron)txtDisplayPatron.SelectedItem;
-                Media m = (Media)txtDisplayMedia.SelectedItem;
+
+                //Check to see if checkout possible
                 if (!p.overdueBooks(dateTimePicker.Value) && p.allowed(m))
                 {
-                    m.CheckOut(p, dateTimePicker.Value);
+                    bool success = true;
+
+                    // For multiple check outs, check that each one is successful
+                    foreach (ListViewItem item in lstvwMediaList.SelectedItems)
+                    {
+                        if (success)
+                        {
+                            Media media = mediaSD[(uint)Convert.ToInt32(item.SubItems[clmID.Index].Text)];
+                            
+                            success = media.CheckOut(p, dateTimePicker.Value) ? true : false;
+                        }
+                    }
+
+                    // Print results
+                    if (success)
+                    {
+                        MessageBox.Show("Check out successful!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Sorry, the requested media item is already checked out.");
+                    }                   
+
+                    // Update info on main screen
+                    UpdatePatronItemsCheckedOut(p);
+                    displayMedia();
+                    CheckCheckInButton();
                 }
             }
         }
@@ -316,29 +383,173 @@ namespace Library
         /// <summary>
         /// Checks in the media
         /// </summary>
-        /// <param name="media">media to be returned</param>
-        /// <param name="patron">patron returning the media</param>
         private void CheckInMedia()
         {
             if (txtDisplayPatron.SelectedIndex == -1)
             {
                 MessageBox.Show(noPatron);
             }
-            if (txtDisplayMedia.SelectedIndex == -1)
+            if (txtPatronItemsCheckedOut.SelectedIndex == -1)
             {
                 MessageBox.Show(noMedia);
             }
             else
             {
                 Patron patron = txtDisplayPatron.SelectedItem as Patron;
-                Media media = txtDisplayMedia.SelectedItem as Media;
+                bool success = true;
 
-                if (patron._currentChecked.ContainsKey(media.ID))
+                // For multiple check ins, check that each is successful
+                foreach (object o in txtPatronItemsCheckedOut.SelectedItems)
                 {
-                    media.CheckIn();
+                    if (success)
+                    {
+                        Media media = o as Media;
+
+                        if (patron._currentChecked.ContainsKey(media.ID))
+                        {
+                            success = media.CheckIn() ? true : false;
+                        }
+                    }
+                }
+
+                // Print results
+                if (success)
+                {
+                    MessageBox.Show("Check in successful!");
+                }
+                else
+                {
+                    MessageBox.Show("Check in failed!");
+                }
+
+                // Update info on main screen
+                UpdatePatronItemsCheckedOut(patron);
+                displayMedia();
+                CheckCheckInButton();
+            }
+        }
+
+        private void lstvwMediaList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            lstvwMediaListChange();
+        }        
+
+        /// <summary>
+        /// Handles when index selections change on the media ListView
+        /// </summary>
+        private void lstvwMediaListChange()
+        {
+            if (lstvwMediaList.SelectedItems.Count > 0)
+            {
+                bool selectionNotCheckedOut = true;
+
+                // Check to see if any of the selected items are already checked out
+                foreach (ListViewItem item in lstvwMediaList.SelectedItems)
+                {
+                    if (selectionNotCheckedOut)
+                    {
+                        Media media = mediaSD[(uint)Convert.ToInt32(item.SubItems[clmID.Index].Text)];
+
+                        selectionNotCheckedOut = media.CheckedOut ? false : true;
+                    }
+                }
+
+                // Toggle button if user can check media out
+                if (selectionNotCheckedOut && txtDisplayPatron.SelectedItems.Count > 0)
+                {
+                    btnCheckOut.Enabled = true;
+                }
+                else
+                {
+                    btnCheckOut.Enabled = false;
                 }
             }
         }
 
+        private void txtPatronItemsCheckedOut_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CheckCheckInButton();
+        }
+
+        /// <summary>
+        /// Updates all the text boxes on main
+        /// </summary>
+        private void UpdateScreens()
+        {
+            if (txtDisplayPatron.SelectedIndex != -1)
+            {
+                UpdatePatronItemsCheckedOut(txtDisplayPatron.SelectedItem as Patron);
+            }
+            else
+            {
+                txtPatronItemsCheckedOut.Items.Clear();
+            }
+
+            displayMedia();
+            displayPatrons();
+
+            if (txtDisplayPatron.SelectedItems.Count == 0)
+            {
+                btnCheckOut.Enabled = false;
+            }
+
+            CheckCheckInButton();
+        }
+
+        /// <summary>
+        /// Clears all boxes related to adding media
+        /// </summary>
+        private void ClearAddMediaFields()
+        {
+            txtMediaType.Text = string.Empty;
+            txtMediaAuthor.Text = string.Empty;
+            txtMediaTitle.Text = string.Empty;
+        }
+
+        /// <summary>
+        /// Clears all boxes related to adding patrons
+        /// </summary>
+        private void ClearAddPatronFields()
+        {
+            txtPatronName.Text = string.Empty;
+            txtPatronCardNum.Text = string.Empty;
+            txtPatronPhone.Text = string.Empty;
+            txtPatronAddress.Text = string.Empty;
+            txtPatronCity.Text = string.Empty;
+            txtPatronState.Text = string.Empty;
+            txtPatronZip.Text = string.Empty;
+            txtPatronDateofBirth.Value = DateTime.Today;
+        }
+
+        /// <summary>
+        /// Clears all boxes related to removing patrons
+        /// </summary>
+        private void ClearRemovePatronFields()
+        {
+            txtRemovePatron.Text = string.Empty;
+        }
+
+        /// <summary>
+        /// Clears all boxes related to removing media
+        /// </summary>
+        private void ClearRemoveMediaFields()
+        {
+            txtMediaRemoveID.Text = string.Empty;
+        }
+
+        /// <summary>
+        /// Determines whether or not to disable the CheckIn button
+        /// </summary>
+        private void CheckCheckInButton()
+        {
+            if (txtPatronItemsCheckedOut.SelectedItems.Count > 0)
+            {
+                btnCheckIn.Enabled = true;
+            }
+            else
+            {
+                btnCheckIn.Enabled = false;
+            }
+        }
     }
 }

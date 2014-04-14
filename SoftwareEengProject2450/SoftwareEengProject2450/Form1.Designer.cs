@@ -30,24 +30,21 @@
         {
             this.tabControlLibrary = new System.Windows.Forms.TabControl();
             this.tabLibraryMain = new System.Windows.Forms.TabPage();
+            this.lstvwMediaList = new System.Windows.Forms.ListView();
+            this.clmTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmCheckedOut = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnCheckOut = new System.Windows.Forms.Button();
-            this.label21 = new System.Windows.Forms.Label();
-            this.txtDisplayCheckInOut = new System.Windows.Forms.ListBox();
+            this.lblPatronDispName = new System.Windows.Forms.Label();
+            this.txtPatronItemsCheckedOut = new System.Windows.Forms.ListBox();
             this.btnClearGUI = new System.Windows.Forms.Button();
-            this.btnDeselect = new System.Windows.Forms.Button();
-            this.txtDisplayMedia = new System.Windows.Forms.ListBox();
             this.txtDisplayPatron = new System.Windows.Forms.ListBox();
-            this.btnViewChkedPerPatron = new System.Windows.Forms.Button();
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
             this.btnCheckIn = new System.Windows.Forms.Button();
-            this.btnSelectMedia = new System.Windows.Forms.Button();
-            this.btnSelectPatron = new System.Windows.Forms.Button();
-            this.btnDisplayAllMedia = new System.Windows.Forms.Button();
             this.txtSearchMedia = new System.Windows.Forms.TextBox();
             this.btnSearchMedia = new System.Windows.Forms.Button();
             this.lblSelectMedia = new System.Windows.Forms.Label();
-            this.btnDisplayAllPatrons = new System.Windows.Forms.Button();
             this.txtSearchPatron = new System.Windows.Forms.TextBox();
             this.btnSearchPatron = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -112,24 +109,18 @@
             // 
             // tabLibraryMain
             // 
+            this.tabLibraryMain.Controls.Add(this.lstvwMediaList);
             this.tabLibraryMain.Controls.Add(this.btnCheckOut);
-            this.tabLibraryMain.Controls.Add(this.label21);
-            this.tabLibraryMain.Controls.Add(this.txtDisplayCheckInOut);
+            this.tabLibraryMain.Controls.Add(this.lblPatronDispName);
+            this.tabLibraryMain.Controls.Add(this.txtPatronItemsCheckedOut);
             this.tabLibraryMain.Controls.Add(this.btnClearGUI);
-            this.tabLibraryMain.Controls.Add(this.btnDeselect);
-            this.tabLibraryMain.Controls.Add(this.txtDisplayMedia);
             this.tabLibraryMain.Controls.Add(this.txtDisplayPatron);
-            this.tabLibraryMain.Controls.Add(this.btnViewChkedPerPatron);
             this.tabLibraryMain.Controls.Add(this.dateTimePicker);
             this.tabLibraryMain.Controls.Add(this.label2);
             this.tabLibraryMain.Controls.Add(this.btnCheckIn);
-            this.tabLibraryMain.Controls.Add(this.btnSelectMedia);
-            this.tabLibraryMain.Controls.Add(this.btnSelectPatron);
-            this.tabLibraryMain.Controls.Add(this.btnDisplayAllMedia);
             this.tabLibraryMain.Controls.Add(this.txtSearchMedia);
             this.tabLibraryMain.Controls.Add(this.btnSearchMedia);
             this.tabLibraryMain.Controls.Add(this.lblSelectMedia);
-            this.tabLibraryMain.Controls.Add(this.btnDisplayAllPatrons);
             this.tabLibraryMain.Controls.Add(this.txtSearchPatron);
             this.tabLibraryMain.Controls.Add(this.btnSearchPatron);
             this.tabLibraryMain.Controls.Add(this.label1);
@@ -141,9 +132,40 @@
             this.tabLibraryMain.Text = "Library Main";
             this.tabLibraryMain.UseVisualStyleBackColor = true;
             // 
+            // lstvwMediaList
+            // 
+            this.lstvwMediaList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.clmTitle,
+            this.clmCheckedOut,
+            this.clmID});
+            this.lstvwMediaList.Location = new System.Drawing.Point(354, 161);
+            this.lstvwMediaList.Name = "lstvwMediaList";
+            this.lstvwMediaList.Size = new System.Drawing.Size(296, 226);
+            this.lstvwMediaList.TabIndex = 32;
+            this.lstvwMediaList.UseCompatibleStateImageBehavior = false;
+            this.lstvwMediaList.View = System.Windows.Forms.View.Details;
+            this.lstvwMediaList.SelectedIndexChanged += new System.EventHandler(this.lstvwMediaList_SelectedIndexChanged);
+            // 
+            // clmTitle
+            // 
+            this.clmTitle.Text = "Title";
+            this.clmTitle.Width = 140;
+            // 
+            // clmCheckedOut
+            // 
+            this.clmCheckedOut.Text = "Checked Out To";
+            this.clmCheckedOut.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.clmCheckedOut.Width = 110;
+            // 
+            // clmID
+            // 
+            this.clmID.Text = "ID";
+            this.clmID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.clmID.Width = 40;
+            // 
             // btnCheckOut
             // 
-            this.btnCheckOut.Location = new System.Drawing.Point(695, 297);
+            this.btnCheckOut.Location = new System.Drawing.Point(367, 403);
             this.btnCheckOut.Name = "btnCheckOut";
             this.btnCheckOut.Size = new System.Drawing.Size(267, 23);
             this.btnCheckOut.TabIndex = 27;
@@ -151,51 +173,33 @@
             this.btnCheckOut.UseVisualStyleBackColor = true;
             this.btnCheckOut.Click += new System.EventHandler(this.btnCheckOut_Click);
             // 
-            // label21
+            // lblPatronDispName
             // 
-            this.label21.AutoSize = true;
-            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label21.Location = new System.Drawing.Point(692, 74);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(159, 18);
-            this.label21.TabIndex = 31;
-            this.label21.Text = "Check In/Check Out";
+            this.lblPatronDispName.AutoSize = true;
+            this.lblPatronDispName.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPatronDispName.Location = new System.Drawing.Point(683, 134);
+            this.lblPatronDispName.Name = "lblPatronDispName";
+            this.lblPatronDispName.Size = new System.Drawing.Size(107, 18);
+            this.lblPatronDispName.TabIndex = 31;
+            this.lblPatronDispName.Text = "Patron Name";
             // 
-            // txtDisplayCheckInOut
+            // txtPatronItemsCheckedOut
             // 
-            this.txtDisplayCheckInOut.Location = new System.Drawing.Point(695, 106);
-            this.txtDisplayCheckInOut.Name = "txtDisplayCheckInOut";
-            this.txtDisplayCheckInOut.Size = new System.Drawing.Size(275, 147);
-            this.txtDisplayCheckInOut.TabIndex = 25;
+            this.txtPatronItemsCheckedOut.Location = new System.Drawing.Point(686, 162);
+            this.txtPatronItemsCheckedOut.Name = "txtPatronItemsCheckedOut";
+            this.txtPatronItemsCheckedOut.Size = new System.Drawing.Size(275, 147);
+            this.txtPatronItemsCheckedOut.TabIndex = 25;
+            this.txtPatronItemsCheckedOut.SelectedIndexChanged += new System.EventHandler(this.txtPatronItemsCheckedOut_SelectedIndexChanged);
             // 
             // btnClearGUI
             // 
-            this.btnClearGUI.Location = new System.Drawing.Point(695, 355);
+            this.btnClearGUI.Location = new System.Drawing.Point(750, 383);
             this.btnClearGUI.Name = "btnClearGUI";
-            this.btnClearGUI.Size = new System.Drawing.Size(267, 23);
+            this.btnClearGUI.Size = new System.Drawing.Size(141, 43);
             this.btnClearGUI.TabIndex = 29;
             this.btnClearGUI.Text = "Clear All";
             this.btnClearGUI.UseVisualStyleBackColor = true;
             this.btnClearGUI.Click += new System.EventHandler(this.btnClearGUI_Click);
-            // 
-            // btnDeselect
-            // 
-            this.btnDeselect.Enabled = false;
-            this.btnDeselect.Location = new System.Drawing.Point(695, 326);
-            this.btnDeselect.Name = "btnDeselect";
-            this.btnDeselect.Size = new System.Drawing.Size(267, 23);
-            this.btnDeselect.TabIndex = 28;
-            this.btnDeselect.Text = "Deselect";
-            this.btnDeselect.UseVisualStyleBackColor = true;
-            this.btnDeselect.Click += new System.EventHandler(this.btnDeselect_Click);
-            // 
-            // txtDisplayMedia
-            // 
-            this.txtDisplayMedia.FormattingEnabled = true;
-            this.txtDisplayMedia.Location = new System.Drawing.Point(354, 162);
-            this.txtDisplayMedia.Name = "txtDisplayMedia";
-            this.txtDisplayMedia.Size = new System.Drawing.Size(296, 264);
-            this.txtDisplayMedia.TabIndex = 22;
             // 
             // txtDisplayPatron
             // 
@@ -205,21 +209,12 @@
             this.txtDisplayPatron.Name = "txtDisplayPatron";
             this.txtDisplayPatron.Size = new System.Drawing.Size(296, 264);
             this.txtDisplayPatron.TabIndex = 8;
-            // 
-            // btnViewChkedPerPatron
-            // 
-            this.btnViewChkedPerPatron.Location = new System.Drawing.Point(39, 437);
-            this.btnViewChkedPerPatron.Name = "btnViewChkedPerPatron";
-            this.btnViewChkedPerPatron.Size = new System.Drawing.Size(156, 23);
-            this.btnViewChkedPerPatron.TabIndex = 10;
-            this.btnViewChkedPerPatron.Text = "View Checked Out Media";
-            this.btnViewChkedPerPatron.UseVisualStyleBackColor = true;
-            this.btnViewChkedPerPatron.Click += new System.EventHandler(this.btnViewChkedPerPatron_Click);
+            this.txtDisplayPatron.SelectedIndexChanged += new System.EventHandler(this.txtDisplayPatron_SelectedIndexChanged);
             // 
             // dateTimePicker
             // 
             this.dateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePicker.Location = new System.Drawing.Point(28, 38);
+            this.dateTimePicker.Location = new System.Drawing.Point(28, 54);
             this.dateTimePicker.Name = "dateTimePicker";
             this.dateTimePicker.Size = new System.Drawing.Size(200, 20);
             this.dateTimePicker.TabIndex = 1;
@@ -228,7 +223,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(26, 12);
+            this.label2.Location = new System.Drawing.Point(26, 28);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(95, 18);
             this.label2.TabIndex = 25;
@@ -236,7 +231,7 @@
             // 
             // btnCheckIn
             // 
-            this.btnCheckIn.Location = new System.Drawing.Point(695, 268);
+            this.btnCheckIn.Location = new System.Drawing.Point(686, 324);
             this.btnCheckIn.Name = "btnCheckIn";
             this.btnCheckIn.Size = new System.Drawing.Size(267, 23);
             this.btnCheckIn.TabIndex = 26;
@@ -244,48 +239,18 @@
             this.btnCheckIn.UseVisualStyleBackColor = true;
             this.btnCheckIn.Click += new System.EventHandler(this.btnCheckIn_Click);
             // 
-            // btnSelectMedia
-            // 
-            this.btnSelectMedia.Location = new System.Drawing.Point(550, 437);
-            this.btnSelectMedia.Name = "btnSelectMedia";
-            this.btnSelectMedia.Size = new System.Drawing.Size(100, 23);
-            this.btnSelectMedia.TabIndex = 23;
-            this.btnSelectMedia.Text = "Select";
-            this.btnSelectMedia.UseVisualStyleBackColor = true;
-            this.btnSelectMedia.Click += new System.EventHandler(this.btnSelectMedia_Click);
-            // 
-            // btnSelectPatron
-            // 
-            this.btnSelectPatron.Location = new System.Drawing.Point(229, 437);
-            this.btnSelectPatron.Name = "btnSelectPatron";
-            this.btnSelectPatron.Size = new System.Drawing.Size(96, 23);
-            this.btnSelectPatron.TabIndex = 13;
-            this.btnSelectPatron.Text = "Select";
-            this.btnSelectPatron.UseVisualStyleBackColor = true;
-            this.btnSelectPatron.Click += new System.EventHandler(this.btnSelectPatron_Click);
-            // 
-            // btnDisplayAllMedia
-            // 
-            this.btnDisplayAllMedia.Location = new System.Drawing.Point(354, 132);
-            this.btnDisplayAllMedia.Name = "btnDisplayAllMedia";
-            this.btnDisplayAllMedia.Size = new System.Drawing.Size(138, 23);
-            this.btnDisplayAllMedia.TabIndex = 19;
-            this.btnDisplayAllMedia.Text = "Display All";
-            this.btnDisplayAllMedia.UseVisualStyleBackColor = true;
-            this.btnDisplayAllMedia.Click += new System.EventHandler(this.btnDisplayAllMedia_Click);
-            // 
             // txtSearchMedia
             // 
-            this.txtSearchMedia.Location = new System.Drawing.Point(354, 106);
+            this.txtSearchMedia.Location = new System.Drawing.Point(354, 134);
             this.txtSearchMedia.Name = "txtSearchMedia";
-            this.txtSearchMedia.Size = new System.Drawing.Size(296, 20);
+            this.txtSearchMedia.Size = new System.Drawing.Size(195, 20);
             this.txtSearchMedia.TabIndex = 18;
             // 
             // btnSearchMedia
             // 
-            this.btnSearchMedia.Location = new System.Drawing.Point(522, 132);
+            this.btnSearchMedia.Location = new System.Drawing.Point(555, 132);
             this.btnSearchMedia.Name = "btnSearchMedia";
-            this.btnSearchMedia.Size = new System.Drawing.Size(128, 23);
+            this.btnSearchMedia.Size = new System.Drawing.Size(95, 23);
             this.btnSearchMedia.TabIndex = 20;
             this.btnSearchMedia.Text = "Search";
             this.btnSearchMedia.UseVisualStyleBackColor = true;
@@ -294,34 +259,24 @@
             // 
             this.lblSelectMedia.AutoSize = true;
             this.lblSelectMedia.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSelectMedia.Location = new System.Drawing.Point(351, 75);
+            this.lblSelectMedia.Location = new System.Drawing.Point(351, 104);
             this.lblSelectMedia.Name = "lblSelectMedia";
             this.lblSelectMedia.Size = new System.Drawing.Size(105, 18);
             this.lblSelectMedia.TabIndex = 16;
             this.lblSelectMedia.Text = "Select Media";
             // 
-            // btnDisplayAllPatrons
-            // 
-            this.btnDisplayAllPatrons.Location = new System.Drawing.Point(29, 131);
-            this.btnDisplayAllPatrons.Name = "btnDisplayAllPatrons";
-            this.btnDisplayAllPatrons.Size = new System.Drawing.Size(138, 23);
-            this.btnDisplayAllPatrons.TabIndex = 6;
-            this.btnDisplayAllPatrons.Text = "Display All";
-            this.btnDisplayAllPatrons.UseVisualStyleBackColor = true;
-            this.btnDisplayAllPatrons.Click += new System.EventHandler(this.btnDisplayAllPatrons_Click);
-            // 
             // txtSearchPatron
             // 
-            this.txtSearchPatron.Location = new System.Drawing.Point(29, 105);
+            this.txtSearchPatron.Location = new System.Drawing.Point(29, 134);
             this.txtSearchPatron.Name = "txtSearchPatron";
-            this.txtSearchPatron.Size = new System.Drawing.Size(296, 20);
+            this.txtSearchPatron.Size = new System.Drawing.Size(196, 20);
             this.txtSearchPatron.TabIndex = 5;
             // 
             // btnSearchPatron
             // 
-            this.btnSearchPatron.Location = new System.Drawing.Point(197, 131);
+            this.btnSearchPatron.Location = new System.Drawing.Point(230, 132);
             this.btnSearchPatron.Name = "btnSearchPatron";
-            this.btnSearchPatron.Size = new System.Drawing.Size(128, 23);
+            this.btnSearchPatron.Size = new System.Drawing.Size(95, 23);
             this.btnSearchPatron.TabIndex = 7;
             this.btnSearchPatron.Text = "Search";
             this.btnSearchPatron.UseVisualStyleBackColor = true;
@@ -330,7 +285,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(26, 74);
+            this.label1.Location = new System.Drawing.Point(25, 104);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(110, 18);
             this.label1.TabIndex = 11;
@@ -778,13 +733,9 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnCheckIn;
-        private System.Windows.Forms.Button btnSelectMedia;
-        private System.Windows.Forms.Button btnSelectPatron;
-        private System.Windows.Forms.Button btnDisplayAllMedia;
         private System.Windows.Forms.TextBox txtSearchMedia;
         private System.Windows.Forms.Button btnSearchMedia;
         private System.Windows.Forms.Label lblSelectMedia;
-        private System.Windows.Forms.Button btnDisplayAllPatrons;
         private System.Windows.Forms.TextBox txtSearchPatron;
         private System.Windows.Forms.Button btnSearchPatron;
         private System.Windows.Forms.Label label1;
@@ -796,9 +747,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.RichTextBox displayOverdueMedia;
-        private System.Windows.Forms.Button btnViewChkedPerPatron;
         private System.Windows.Forms.ListBox txtDisplayPatron;
-        private System.Windows.Forms.ListBox txtDisplayMedia;
         private System.Windows.Forms.TextBox txtPatronName;
         private System.Windows.Forms.Label lblpatronName;
         private System.Windows.Forms.Label label5;
@@ -832,12 +781,15 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.ComboBox txtMediaType;
         private System.Windows.Forms.Button btnClearGUI;
-        private System.Windows.Forms.Button btnDeselect;
         private System.Windows.Forms.TextBox txtMediaAuthor;
         private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.ListBox txtDisplayCheckInOut;
+        private System.Windows.Forms.ListBox txtPatronItemsCheckedOut;
         private System.Windows.Forms.Button btnCheckOut;
-        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.Label lblPatronDispName;
+        private System.Windows.Forms.ListView lstvwMediaList;
+        private System.Windows.Forms.ColumnHeader clmTitle;
+        private System.Windows.Forms.ColumnHeader clmCheckedOut;
+        private System.Windows.Forms.ColumnHeader clmID;
 
     }
 }

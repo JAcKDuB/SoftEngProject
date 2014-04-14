@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Linq;
+
 namespace Library
 {
     public enum MediaType {ADULTBOOK, CHILDBOOK, DVD, VIDEO };
@@ -15,7 +17,9 @@ namespace Library
         public static string _title = "\nTitle: ";
         public static string _author = " Author: ";
         public static string _checkedout = " Checked Out? ";
+
 		// ******************************** Properties ***************************************
+
         private Patron _borrower;
 		public static uint UniqueTitleCount { get; private set; }
         private MediaType mType;
@@ -91,10 +95,12 @@ namespace Library
             setLoanTime(mType);
             CheckedOut = false;
 			ID = ++UniqueTitleCount;
+            Borrower = Patron.None;
             this.mType = mType;
 		}
 
 		// ********************************* Methods *****************************************
+
         /// <summary>
         /// Set allowed loan time based on MediaType
         /// </summary>
@@ -119,6 +125,7 @@ namespace Library
             }
         }
         //*****************************************************
+
         public TimeSpan getLoanTime()
         {
             return loanTime;
@@ -127,53 +134,67 @@ namespace Library
 		/// Checks the book out, assigns borrower
 		/// </summary>
 		/// <param name="borrower">Patron borrowing the media</param>
-		public void CheckOut(Patron borrower, DateTime dateChecked)
+		public bool CheckOut(Patron borrower, DateTime dateChecked)
 		{
           //call checkout from patron, which needs to check age for eligibility
             //has patron already checked maximum number of items?
             //is book already checked out?
             
-            if (this.CheckedOut == false && borrower._currentChecked.Count <= borrower._maxCheckouts)
+            if (CheckedOut == false && borrower._currentChecked.Count <= borrower._maxCheckouts)
             {
-                this.CheckedOut = true;
+                CheckedOut = true;
                 borrower.addMedia(this, this.ID);
-                this.dateCheckedOut = dateChecked;
+                dateCheckedOut = dateChecked;
                 Borrower = borrower;
-                MessageBox.Show("Check out successful!");
+                return true;
             }
             else
             {
-                MessageBox.Show("Sorry, the requested media item is already checked out.");
+                return false;
             }
 		}
 
 		// *********************************************************
 
-		/// <summary>
-		/// Checks the book in, releases borrower
-		/// </summary>
-		public void CheckIn()
+        /// <summary>
+        /// Checks the book in, releases borrower
+        /// </summary>
+		/// <param name="verbose">Turns message boxes on (default) or off</param>
+		/// <returns>Success state</returns>
+		public bool CheckIn(bool verbose = true)
 		{
-            if (this.CheckedOut && Borrower != null)
+            if (Borrower != Patron.None)
             {
-                this.CheckedOut = false;
+                CheckedOut = false;
                 Borrower.removeMedia(this, this.ID);
                 Borrower = Patron.None;
-                MessageBox.Show("Check in successful!");
+                return true;
             }
             else
             {
-                MessageBox.Show("Check in failed!");
+                MessageBox.Show("The book was not previously checked out!");
+                return false;
             }
 		}
 
-		// ***********************************************************************************
+        //************************************************************
 
         public override string ToString()
         {
             return String.Format(_title+Title+ _checkedout + CheckedOut + "\n");
         }
-      //************************************************************
 
+        //************************************************************
+
+        /// <summary>
+        /// Sets up media class for use
+        /// </summary>
+        /// <param name="last">Last used ID</param>
+        public static void Setup(uint last)
+        {
+            UniqueTitleCount = last;
+        }
+
+		// ***********************************************************************************
 	}
 }

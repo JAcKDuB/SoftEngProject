@@ -25,8 +25,6 @@ namespace Library
         public static Patron _none = new Patron();
         public static Patron None { get {return _none;} set {_none = value;} }
 
-
-
         //validation and display messages/popups
         static Regex validator;
         private string noneChecked = "This patron does not have any checked-out books to be removed.";
@@ -205,9 +203,14 @@ namespace Library
             foreach (KeyValuePair<uint,Media> mm in this._currentChecked)
             {
                 if (mm.Value.Overdue(date))
-                    overdue=  true;
+                {
+                    overdue = true;
+                    MessageBox.Show("Checkout not allowed due to overdue books.");
+                }
                 else
-                    overdue =false;
+                {
+                    overdue = false;
+                }
             }
             return overdue;
            
