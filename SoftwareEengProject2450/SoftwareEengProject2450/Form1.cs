@@ -32,7 +32,10 @@ namespace Library
             db.readPatron(ref patronSD);
             txtPatronItemsCheckedOut.SelectionMode = SelectionMode.MultiExtended;
             lblPatronDispName.Text = string.Empty;
-            Media.Setup(mediaSD.Keys.Last());
+            if (mediaSD.Count > 0)
+            {
+                Media.Setup(mediaSD.Keys.Last());
+            }
             UpdateScreens();
         }
 
@@ -347,7 +350,7 @@ namespace Library
                 Patron p = (Patron)txtDisplayPatron.SelectedItem;
 
                 //Check to see if checkout possible
-                if (!p.overdueBooks(dateTimePicker.Value) && p.allowed(m))
+                if (!p.overdueBooks(dateTimePicker.Value))
                 {
                     bool success = true;
 
@@ -357,8 +360,15 @@ namespace Library
                         if (success)
                         {
                             Media media = mediaSD[(uint)Convert.ToInt32(item.SubItems[clmID.Index].Text)];
-                            
-                            success = media.CheckOut(p, dateTimePicker.Value) ? true : false;
+
+                            if (p.allowed(media))
+                            {
+                                success = media.CheckOut(p, dateTimePicker.Value) ? true : false;
+                            }
+                            else
+                            {
+                                success = false;
+                            }
                         }
                     }
 
@@ -369,7 +379,7 @@ namespace Library
                     }
                     else
                     {
-                        MessageBox.Show("Sorry, the requested media item is already checked out.");
+                        MessageBox.Show("Check out failed!");
                     }                   
 
                     // Update info on main screen
@@ -501,7 +511,7 @@ namespace Library
         /// </summary>
         private void ClearAddMediaFields()
         {
-            txtMediaType.Text = string.Empty;
+            txtMediaType.SelectedIndex = 0;
             txtMediaAuthor.Text = string.Empty;
             txtMediaTitle.Text = string.Empty;
         }
